@@ -8,12 +8,26 @@ public class CardHand {
 
 	}
 
+	public void turnCardsFaceUp() {
+		for(int i=0; i < hand.size(); i++) {
+			hand.get(i).setFaceUp();
+		}
+	}
+	
 	public int getHardHand() {
-		return -1;
+		int cardTotal = 0;
+		for(int i=0; i < hand.size(); i++) {
+			cardTotal += hand.get(i).getValue();
+		}
+		return cardTotal;
 	}
 
 	public int getSoftHand() {
-		return -1;
+		int cardTotal = getHardHand();
+		if(cardTotal < 12 && haveAnAce())
+			cardTotal += 10;
+		return cardTotal;
+			
 	}
 
 	public void addCard(Card card) {
