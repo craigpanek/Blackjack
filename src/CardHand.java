@@ -1,3 +1,7 @@
+/**
+ * Copyright 2014 Craig Panek, Peter "Felix" Nguyen
+ */
+
 import java.util.ArrayList;
 
 public class CardHand {
@@ -9,14 +13,14 @@ public class CardHand {
 	}
 
 	public void turnCardsFaceUp() {
-		for(int i=0; i < hand.size(); i++) {
+		for (int i = 0; i < hand.size(); i++) {
 			hand.get(i).setFaceUp();
 		}
 	}
-	
+
 	public int getHardHand() {
 		int cardTotal = 0;
-		for(int i=0; i < hand.size(); i++) {
+		for (int i = 0; i < hand.size(); i++) {
 			cardTotal += hand.get(i).getValue();
 		}
 		return cardTotal;
@@ -24,10 +28,10 @@ public class CardHand {
 
 	public int getSoftHand() {
 		int cardTotal = getHardHand();
-		if(cardTotal < 12 && haveAnAce())
+		if (cardTotal < 12 && haveAnAce())
 			cardTotal += 10;
 		return cardTotal;
-			
+
 	}
 
 	public void addCard(Card card) {

@@ -1,3 +1,7 @@
+/**
+ * Copyright 2014 Craig Panek, Peter "Felix" Nguyen
+ */
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,11 +18,11 @@ import javax.swing.border.LineBorder;
 
 public class BlackjackFrame extends JFrame {
 
-	private int balance = 100;
 	private JButton jbtnPlus1 = new JButton("+1");
 	private JButton jbtnPlus5 = new JButton("+5");
 	private JButton jbtnClear = new JButton("Clear");
-	private JLabel jlblBalance = new JLabel("Balance: " + balance);
+	private JLabel jlblBalance = new JLabel(" Balance:");
+	private JLabel jlblBet = new JLabel("  Bet:");
 	private JButton jbtnDeal = new JButton("Deal");
 	private JButton jbtnHit = new JButton("Hit");
 	private JButton jbtnStand = new JButton("Stand");
@@ -27,7 +31,7 @@ public class BlackjackFrame extends JFrame {
 	private JButton jbtnReset = new JButton("Reset");
 	private BlackjackGame game = new BlackjackGame();
 	private ImagePanel imagePanel = new ImagePanel(game);
-	
+
 	public BlackjackFrame() {
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		JPanel lowerLeftPanel = new JPanel(new GridLayout(2, 1));
@@ -36,8 +40,9 @@ public class BlackjackFrame extends JFrame {
 		p1.add(jbtnPlus1);
 		p1.add(jbtnPlus5);
 		p1.add(jbtnClear);
-		JPanel p2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel p2 = new JPanel(new GridLayout(1, 2));
 		p2.add(jlblBalance);
+		p2.add(jlblBet);
 		lowerLeftPanel.add(p1);
 		lowerLeftPanel.add(p2);
 		lowerLeftPanel.setBorder(new LineBorder(Color.BLACK, 1));
@@ -58,30 +63,58 @@ public class BlackjackFrame extends JFrame {
 		mainPanel.add(lowerPanel, BorderLayout.SOUTH);
 		mainPanel.add(imagePanel, BorderLayout.CENTER);
 		imagePanel.setPreferredSize(new Dimension(300, 300));
+		showBalanceAndBet();
 		add(mainPanel);
 		jbtnDeal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-					game.dealCards();
-					imagePanel.repaint();
+				game.dealCards();
+				imagePanel.repaint();
+				showBalanceAndBet();
 			}
 		});
 		jbtnHit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				game.playerHit();
 				imagePanel.repaint();
+				showBalanceAndBet();
 			}
 		});
 		jbtnReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				game.reset();
 				imagePanel.repaint();
+				showBalanceAndBet();
 			}
 		});
 		jbtnStand.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				game.playerStand();
 				imagePanel.repaint();
+				showBalanceAndBet();
 			}
 		});
+		jbtnPlus1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				game.setBet(game.getBet() + 1);
+				showBalanceAndBet();
+			}
+		});
+		jbtnPlus5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				game.setBet(game.getBet() + 5);
+				showBalanceAndBet();
+			}
+		});
+		jbtnClear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				game.clearBet();
+				showBalanceAndBet();
+			}
+		});
+	}
+
+	private void showBalanceAndBet() {
+		jlblBalance.setText(" Balance: " + game.getBalance());
+		jlblBet.setText("  Bet: " + game.getBet());
 	}
 }

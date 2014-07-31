@@ -1,73 +1,101 @@
+/**
+ * Copyright 2014 Craig Panek, Peter "Felix" Nguyen
+ */
+
 public class BlackjackGame {
 
+	// NEED TO CHECK IF DEALER HAS BLACKJACK
+	// NEED TO CHECK IF PLAYER HAS BLACKJACK
+	// NEED TO ADD DOUBLE DOWN FEATURE
+	// NEED TO ADD SPLIT FEATURE
+	// MIGHT WANT TO HAVE MULTIPLE DECKS
+	// MIGHT WANT TO SHOW INFORMATION ABOUT SHUFFLING
+	// CAN ENHANCE GUI
+	// CAN ADD SOUND
+
 	private final int START_OF_GAME = 1;
-	private final int WAITING_TO_DEAL = 2;
-	private final int PLAYERS_TURN = 3;
-	private final int PLAYER_BUST = 4;
-	private final int DEALER_BUST = 5;
-	private final int DEALER_WON = 6;
-	private final int PUSH = 7;
-	private final int PLAYER_WON = 8;
+	private final int PLAYERS_TURN = 2;
+	private final int PLAYER_BUST = 3;
+	private final int DEALER_BUST = 4;
+	private final int DEALER_WON = 5;
+	private final int PUSH = 6;
+	private final int PLAYER_WON = 7;
+	private final int OUT_OF_MONEY = 8;
 	private Deck deck = new Deck();
 	private DealerHand dealerHand;
 	private PlayerHand playerHand;
 	private int state = START_OF_GAME;
-	
+	private int bet = 0;
+	private int balance = 100;
+
 	public BlackjackGame() {
-		deck.shuffleDeck();
+		reset();
 	}
-	
+
 	public void reset() {
-		state = START_OF_GAME;
+		balance = 100;
+		bet = 0;
 		deck.shuffleDeck();
 		playerHand = null;
 		dealerHand = null;
+		state = START_OF_GAME;
 	}
-	
+
 	private void determineOutcome() {
 		dealerHand.turnCardsFaceUp();
 		int playerTotal = playerHand.getSoftHand();
-		int	dealerTotal = dealerHand.getSoftHand();
-		if(dealerTotal > 21) {
+		int dealerTotal = dealerHand.getSoftHand();
+		if (dealerTotal > 21) {
 			state = DEALER_BUST;
-			return;
-		}
-		if(dealerTotal > playerTotal) {
+			balance += bet;
+		} else if (dealerTotal > playerTotal) {
 			state = DEALER_WON;
-			return;
-		}
-		if(dealerTotal == playerTotal) {
+			balance -= bet;
+		} else if (dealerTotal == playerTotal) {
 			state = PUSH;
-			return;
+		} else {
+			state = PLAYER_WON;
+			balance += bet;
 		}
-		state = PLAYER_WON;
+		bet = 0;
+		verifyBalance();
 	}
-	
+
 	private void dealerPlay() {
-		while(dealerHand.getSoftHand() < 18 && dealerHand.getHardHand() < 17) {
+		while (dealerHand.getSoftHand() < 18 && dealerHand.getHardHand() < 17) {
 			dealerHand.addCard(deck.drawCard());
 		}
 		determineOutcome();
 	}
-	
+
 	public void playerStand() {
-		dealerPlay();
+		if (state == PLAYERS_TURN)
+			dealerPlay();
 	}
-	
+
 	public void playerHit() {
-		if(state == PLAYERS_TURN) {
+		if (state == PLAYERS_TURN) {
 			playerHand.addCard(deck.drawCard());
-			if(playerHand.isBust()) {
+			if (playerHand.isBust()) {
 				state = PLAYER_BUST;
+				balance -= bet;
+				bet = 0;
+				verifyBalance();
 			}
 		}
 	}
-	
+
+	private void verifyBalance() {
+		if (balance <= 0) {
+			state = OUT_OF_MONEY;
+		}
+	}
+
 	public void dealCards() {
-		if(state != PLAYERS_TURN) {
+		if (state != PLAYERS_TURN && state != OUT_OF_MONEY && (getBet() != 0)) {
 			dealerHand = new DealerHand();
 			playerHand = new PlayerHand();
-			if(!deck.isEnoughCardsInDeck()) {
+			if (!deck.isEnoughCardsInDeck()) {
 				// insert something here
 				System.out.println("Shuffling deck");
 				deck.shuffleDeck();
@@ -89,30 +117,51 @@ public class BlackjackGame {
 	}
 
 	public String getMessage1() {
-		if(state == START_OF_GAME)
+		if (state == START_OF_GAME)
 			return "Blackjack";
 		else
 			return "";
 	}
-	
+
 	public String getMessage2() {
-		if(state == START_OF_GAME)
-			return "Press \"deal\" to start game";
-		else if(state == WAITING_TO_DEAL)
-			return "Press \"Deal\" to continue";
-		else if(state == PLAYERS_TURN)
+		if (state == START_OF_GAME)
+			return "Press \"Deal\" after betting";
+		else if (state == PLAYERS_TURN)
 			return "Player's turn";
-		else if(state == PLAYER_BUST)
-			return "Player busts - Press \"Deal\" to continue";
-		else if(state == DEALER_BUST)
-			return "Dealer busts - press \"Deal\" to continue";
-		else if(state == DEALER_WON)
-			return "Dealer won - press \"Deal\" to continue";
-		else if(state == PUSH)
-			return "Push - press \"Deal\" to continue";
-		else if(state == PLAYER_WON)
-			return "Player won - press \"Deal\" to continue";
+		else if (state == PLAYER_BUST)
+			return "Player busts.  Press \"Deal\" after betting";
+		else if (state == DEALER_BUST)
+			return "Dealer busts.  Press \"Deal\" after betting";
+		else if (state == DEALER_WON)
+			return "Dealer won.  Press \"Deal\" after betting";
+		else if (state == PUSH)
+			return "Push.  Press \"Deal\" after betting";
+		else if (state == PLAYER_WON)
+			return "Player won.  Press \"Deal\" after betting";
+		else if (state == OUT_OF_MONEY)
+			return "Sorry you are out of money!";
 		else
 			return "";
+	}
+
+	public void clearBet() {
+		setBet(0);
+	}
+
+	public int getBet() {
+		return bet;
+	}
+
+	public void setBet(int bet) {
+		if (state != OUT_OF_MONEY && state != PLAYERS_TURN)
+			this.bet = bet;
+	}
+
+	public int getBalance() {
+		return balance;
+	}
+
+	public void setBalance(int balance) {
+		this.balance = balance;
 	}
 }

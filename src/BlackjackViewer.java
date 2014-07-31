@@ -1,3 +1,7 @@
+/**
+ * Copyright 2014 Craig Panek, Peter "Felix" Nguyen
+ */
+
 import javax.swing.JFrame;
 
 public class BlackjackViewer {
@@ -6,8 +10,8 @@ public class BlackjackViewer {
 		frame.setTitle("Blackjack");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
-		frame.setSize(700,  500);
-		//frame.pack();
+		frame.setSize(700, 500);
+		// frame.pack();
 		frame.setVisible(true);
 	}
 }
