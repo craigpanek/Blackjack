@@ -5,39 +5,68 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.TexturePaint;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class ImagePanel extends JPanel {
+    private BufferedImage bi = null;
+    private final TexturePaint texture;
 
-	private BlackjackGame game;
+    private BlackjackGame game;
 
-	public ImagePanel(BlackjackGame game) {
-		this.game = game;
-	}
+    public ImagePanel(BlackjackGame game) {
+        this.game = game;
+        setOpaque(false);
 
-	private void paintHand(CardHand hand, int yVal, Graphics g) {
-		ArrayList<Card> cards = hand.getCards();
-		for (int i = 0; i < cards.size(); i++) {
-			g.drawImage(cards.get(i).getImage(), (75 + (30 * i)), yVal, this);
-		}
-	}
+        try {
+            File file = new File("image/table/poker-surface-2.png");
+            bi = ImageIO.read(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
 
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
+        texture = new TexturePaint
+                (bi, new Rectangle(bi.getWidth(), bi.getHeight()));
+    }
 
-		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 70));
-		g.setColor(Color.BLACK);
-		g.drawString(game.getMessage1(), 170, 185);
+    private void paintHand(CardHand hand, int yVal, Graphics g) {
+        ArrayList<Card> cards = hand.getCards();
+        for (int i = 0; i < cards.size(); i++) {
+            g.drawImage(cards.get(i).getImage(), (75 + (30 * i)), yVal, this);
+        }
+    }
 
-		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
-		g.setColor(Color.RED);
-		g.drawString(game.getMessage2(), 180, 355);
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
-		if (game.getDealerHand() != null) {
-			paintHand(game.getDealerHand(), 25, g);
-			paintHand(game.getPlayerHand(), 190, g);
-		}
-	}
+        Graphics2D g2 = (Graphics2D)g;
+
+        g2.setPaint(texture);
+        g2.fillRect(0, 0, getWidth(), getHeight());
+
+        super.paintComponent(g);
+
+        g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 70));
+        g.setColor(Color.BLACK);
+        g.drawString(game.getMessage1(), 170, 185);
+
+        g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
+        g.setColor(Color.RED);
+        g.drawString(game.getMessage2(), 180, 355);
+
+        if (game.getDealerHand() != null) {
+            paintHand(game.getDealerHand(), 25, g);
+            paintHand(game.getPlayerHand(), 190, g);
+        }
+    }
 }
