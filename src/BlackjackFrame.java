@@ -28,6 +28,7 @@ public class BlackjackFrame extends JFrame {
 	private JButton jbtnStand = new JButton("Stand");
 	private JButton jbtnDouble = new JButton("Double");
 	private JButton jbtnSplit = new JButton("Split");
+	private JButton jbtnRebet = new JButton("Rebet");
 	private JButton jbtnReset = new JButton("Reset");
 	private BlackjackGame game = new BlackjackGame();
 	private ImagePanel imagePanel = new ImagePanel(game);
@@ -54,6 +55,7 @@ public class BlackjackFrame extends JFrame {
 		p3.add(jbtnDouble);
 		p3.add(jbtnSplit);
 		JPanel p4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		p4.add(jbtnRebet);
 		p4.add(jbtnReset);
 		lowerRightPanel.add(p3);
 		lowerRightPanel.add(p4);
@@ -96,18 +98,35 @@ public class BlackjackFrame extends JFrame {
 		jbtnPlus1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				game.setBet(game.getBet() + 1);
+				imagePanel.repaint();
 				showBalanceAndBet();
 			}
 		});
 		jbtnPlus5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				game.setBet(game.getBet() + 5);
+				imagePanel.repaint();
 				showBalanceAndBet();
 			}
 		});
 		jbtnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				game.clearBet();
+				imagePanel.repaint();
+				showBalanceAndBet();
+			}
+		});
+		jbtnRebet.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				game.setBet(game.getPreviousBet());
+				imagePanel.repaint();
+				showBalanceAndBet();
+			}
+		});
+		jbtnDouble.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				game.doubleDown();
+				imagePanel.repaint();
 				showBalanceAndBet();
 			}
 		});

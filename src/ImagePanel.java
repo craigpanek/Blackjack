@@ -33,7 +33,7 @@ public class ImagePanel extends JPanel {
 
 		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
 		g.setColor(Color.RED);
-		g.drawString(game.getMessage2(), 200, 355);
+		g.drawString(game.getMessage2(), 180, 355);
 
 		if (game.getDealerHand() != null) {
 			paintHand(game.getDealerHand(), 25, g);

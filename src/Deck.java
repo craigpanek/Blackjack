@@ -63,5 +63,8 @@ public class Deck {
 			deck.set(i, deck.get(index));
 			deck.set(index, temp);
 		}
+		for(int i=0; i < 52; i++) {
+			deck.get(i).setFaceUp();
+		}
 	}
 }

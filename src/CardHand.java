@@ -38,7 +38,7 @@ public class CardHand {
 		hand.add(card);
 	}
 
-	boolean handIsBlackjack() {
+	boolean isBlackjack() {
 		return ((hand.get(0).isAce() && hand.get(1).isFaceCard()) || (hand
 				.get(0)).isFaceCard() && hand.get(1).isAce());
 	}

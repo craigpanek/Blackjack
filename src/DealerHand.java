@@ -3,5 +3,7 @@
  */
 
 public class DealerHand extends CardHand {
-
+	public void showDealerDownCard() {
+		super.getCards().get(1).setFaceUp();
+	}
 }

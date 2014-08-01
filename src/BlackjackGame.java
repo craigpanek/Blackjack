@@ -4,9 +4,6 @@
 
 public class BlackjackGame {
 
-	// NEED TO CHECK IF DEALER HAS BLACKJACK
-	// NEED TO CHECK IF PLAYER HAS BLACKJACK
-	// NEED TO ADD DOUBLE DOWN FEATURE
 	// NEED TO ADD SPLIT FEATURE
 	// MIGHT WANT TO HAVE MULTIPLE DECKS
 	// MIGHT WANT TO SHOW INFORMATION ABOUT SHUFFLING
@@ -21,11 +18,15 @@ public class BlackjackGame {
 	private final int PUSH = 6;
 	private final int PLAYER_WON = 7;
 	private final int OUT_OF_MONEY = 8;
+	private final int BOTH_HAVE_BLACKJACK = 9;
+	private final int DEALER_HAS_BLACKJACK = 10;
+	private final int PLAYER_HAS_BLACKJACK = 11;
 	private Deck deck = new Deck();
 	private DealerHand dealerHand;
 	private PlayerHand playerHand;
 	private int state = START_OF_GAME;
 	private int bet = 0;
+	private int previousBet = 0;
 	private int balance = 100;
 
 	public BlackjackGame() {
@@ -58,9 +59,37 @@ public class BlackjackGame {
 			balance += bet;
 		}
 		bet = 0;
-		verifyBalance();
 	}
 
+	public void doubleDown() {
+		if(state == PLAYERS_TURN && playerHand.getCards().size() == 2
+				&& (balance >= (2 * bet))) {
+			bet *= 2;
+			playerHit();
+			if(state != PLAYER_BUST)
+				dealerPlay();
+		}
+	}
+	
+	private void checkForBlackjacks() {
+		// if both dealer and player have blackjack, it's a push
+		if(dealerHand.isBlackjack() && playerHand.isBlackjack()) {
+			state = BOTH_HAVE_BLACKJACK;
+			dealerHand.showDealerDownCard();
+			bet = 0;
+		} else if(dealerHand.isBlackjack()) {
+			state = DEALER_HAS_BLACKJACK;
+			dealerHand.showDealerDownCard();
+			balance -= bet;
+			bet = 0;
+		} else if(playerHand.isBlackjack()) {
+			state = PLAYER_HAS_BLACKJACK;
+			dealerHand.showDealerDownCard();
+			balance += bet;
+			bet = 0;
+		}
+	}
+	
 	private void dealerPlay() {
 		while (dealerHand.getSoftHand() < 18 && dealerHand.getHardHand() < 17) {
 			dealerHand.addCard(deck.drawCard());
@@ -80,12 +109,12 @@ public class BlackjackGame {
 				state = PLAYER_BUST;
 				balance -= bet;
 				bet = 0;
-				verifyBalance();
+				dealerHand.showDealerDownCard();
 			}
 		}
 	}
 
-	private void verifyBalance() {
+	private void checkForGameOver() {
 		if (balance <= 0) {
 			state = OUT_OF_MONEY;
 		}
@@ -93,6 +122,7 @@ public class BlackjackGame {
 
 	public void dealCards() {
 		if (state != PLAYERS_TURN && state != OUT_OF_MONEY && (getBet() != 0)) {
+			previousBet = bet;
 			dealerHand = new DealerHand();
 			playerHand = new PlayerHand();
 			if (!deck.isEnoughCardsInDeck()) {
@@ -105,6 +135,7 @@ public class BlackjackGame {
 			playerHand.addCard(deck.drawCard());
 			playerHand.addCard(deck.drawCard());
 			state = PLAYERS_TURN;
+			checkForBlackjacks();
 		}
 	}
 
@@ -126,6 +157,14 @@ public class BlackjackGame {
 	public String getMessage2() {
 		if (state == START_OF_GAME)
 			return "Press \"Deal\" after betting";
+		else if(state == BOTH_HAVE_BLACKJACK)
+			return "Both have blackjack.  Push.  Press \"Deal\" after betting";
+		else if(state == DEALER_HAS_BLACKJACK)
+			return "Dealer has blackjack.  Dealer wins. Press \"Deal\" " 
+					+ "after betting";
+		else if(state == PLAYER_HAS_BLACKJACK)
+			return "Player has blackjack.  Player wins. Press \"Deal\" "
+					+ "after betting";
 		else if (state == PLAYERS_TURN)
 			return "Player's turn";
 		else if (state == PLAYER_BUST)
@@ -133,11 +172,11 @@ public class BlackjackGame {
 		else if (state == DEALER_BUST)
 			return "Dealer busts.  Press \"Deal\" after betting";
 		else if (state == DEALER_WON)
-			return "Dealer won.  Press \"Deal\" after betting";
+			return "Dealer wins.  Press \"Deal\" after betting";
 		else if (state == PUSH)
 			return "Push.  Press \"Deal\" after betting";
 		else if (state == PLAYER_WON)
-			return "Player won.  Press \"Deal\" after betting";
+			return "Player wins.  Press \"Deal\" after betting";
 		else if (state == OUT_OF_MONEY)
 			return "Sorry you are out of money!";
 		else
@@ -153,8 +192,14 @@ public class BlackjackGame {
 	}
 
 	public void setBet(int bet) {
-		if (state != OUT_OF_MONEY && state != PLAYERS_TURN)
+		checkForGameOver();
+		if (state != OUT_OF_MONEY && state != PLAYERS_TURN
+				&& balance >= bet)
 			this.bet = bet;
+	}
+
+	public int getPreviousBet() {
+		return previousBet;
 	}
 
 	public int getBalance() {
