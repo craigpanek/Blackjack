@@ -15,7 +15,8 @@ public class Deck {
 
 	public Deck() {
 		int count = 1;
-		ImageIcon backImageIcon = new ImageIcon("image/card/b1fv.png");
+		java.net.URL url = this.getClass().getResource("image/card/b1fv.png");
+		ImageIcon backImageIcon = new ImageIcon(url);
 		verifyImageIconLoad(backImageIcon);
 
 		for (int suitIndex = 0; suitIndex < 4; suitIndex++) {
@@ -23,8 +24,9 @@ public class Deck {
 				int value = faceValue;
 				if (faceValue > 10)
 					value = 10;
-				ImageIcon faceImageIcon = new ImageIcon("image/card/" + count
-						+ ".png");
+				url = this.getClass().getResource("image/card/"
+					+ count	+ ".png");
+				ImageIcon faceImageIcon = new ImageIcon(url);
 				verifyImageIconLoad(faceImageIcon);
 				Card card = new Card(faceImageIcon, backImageIcon,
 						Card.suits[suitIndex], Card.titles[faceValue - 1],
